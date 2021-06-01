@@ -1,0 +1,4 @@
+# Ignore everything
+*
+# Allow only rb files from submodule
+!src/**/*.rb
