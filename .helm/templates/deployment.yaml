@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    env: {{ .Values.global.env }}
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      env: {{ .Values.global.env }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        env: {{ .Values.global.env }}
+    spec:
+      containers:
+      - name: httprb
+        securityContext:
+            {{- toYaml .Values.app.securityContext | nindent 12 }}
+        image:  {{ .Values.app.image }}
+        imagePullPolicy: {{ .Values.app.imagePullPolicy }} 
+        ports:
+        - name: {{ .Values.app.service.name }}
+          containerPort: {{ .Values.app.service.port }}
+        resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+        readinessProbe:
+#          httpGet:
+#            path: "/healthcheck"
+#            port: {{ .Values.app.service.name }}
+            {{- toYaml .Values.app.probe | nindent 10 }}
+      securityContext:
+          {{- toYaml .Values.app.podSecurityContext | nindent 8 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    env: {{ .Values.global.env }}
+spec:
+  type: {{ .Values.app.service.type }}
+  ports:
+    - port: {{ .Values.app.service.port }}
+      targetPort: {{ .Values.app.service.name }}
+      protocol: {{ .Values.app.service.protocol }}
+      name: {{ .Values.app.service.name }}
+  selector:
+    app: {{ .Chart.Name }}
+    env: {{ .Values.global.env }}
+
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    env: {{ .Values.global.env }}
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      env: {{ .Values.global.env }}

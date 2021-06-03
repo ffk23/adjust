@@ -1,0 +1,13 @@
+Name: httprb
+apiVersion: v1
+version: 0.0.1
+home: https://github.com/ffk23/adjust 
+description: Sample Helm chart for http ruby server  
+keywords:
+  - http
+  - ruby
+sources:
+  - https://github.com/sawasy/http_server
+  - https://github.com/ffk23/adjust
+engine: gotpl
+kubeVersion: ">=1.10.0-0"

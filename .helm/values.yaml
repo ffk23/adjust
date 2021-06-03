@@ -1,0 +1,34 @@
+global:
+  env: ""
+app:
+  image: ""
+  imagePullPolicy: Never
+  service:
+    type: LoadBalancer
+    port: 80
+    name: app-port
+    protocol: TCP
+
+  resources:
+    limits:
+      cpu: 150m
+      memory: 200Mi
+    requests:
+      cpu: 150m
+      memory: 200Mi
+  probe:
+    exec:
+      command:
+      - sh
+      - -c
+      - curl -s http://localhost/healthcheck | grep "OK"
+    initialDelaySeconds: 1
+    successThreshold: 1
+    failureThreshold: 1
+    periodSeconds: 15
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 54338
+  podSecurityContext:
+    fsGroup: 54338
+
